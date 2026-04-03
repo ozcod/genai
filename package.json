@@ -11,8 +11,11 @@
   "license": "ISC",
   "dependencies": {
     "@tavily/core": "^0.7.2",
+    "cors": "^2.8.6",
     "dotenv": "^17.3.1",
-    "groq-sdk": "^1.1.2"
+    "express": "^5.2.1",
+    "groq-sdk": "^1.1.2",
+    "save": "^2.9.0"
   },
   "description": ""
 }
