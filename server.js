@@ -18,11 +18,11 @@ app.post("/chat", async (req, res) => {
   if (!message || !threadId) {
     return res.status(400).json({ error: "All fields are required" });
   }
-  console.log("Received message:", message);
+
   const result = await generate(message, threadId);
   res.json({ message: result });
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  // console.log(`Server is running on port ${port}`);
 });
