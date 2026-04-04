@@ -1,6 +1,6 @@
-import readline from "node:readline/promises";
 import Groq from "groq-sdk";
 import { tavily } from "@tavily/core";
+import NodeCache from "node-cache";
 
 const tvly = tavily({
   apiKey: process.env.TAVILY_API_KEY,
@@ -9,8 +9,10 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-export async function generate(userMessage) {
-  const message = [
+const cache = new NodeCache({ stdTTL: 60 * 60 * 24 });
+
+export async function generate(userMessage, threadId) {
+  const baseMessages = [
     {
       role: "system",
       content: `You are a smart personal assistant.
@@ -38,12 +40,20 @@ export async function generate(userMessage) {
     },
   ];
 
+  const message = cache.get(threadId) ?? baseMessages;
+
   message.push({
     role: "user",
     content: userMessage,
   });
 
+  const MaxRetries = 10;
+  let count = 0;
   while (true) {
+    if (count > MaxRetries) {
+      return "Sorry, I'm having trouble generating a response right now. Please try again later.";
+    }
+    count++;
     const completions = await groq.chat.completions.create({
       model: "openai/gpt-oss-20b",
       temperature: 0,
@@ -76,6 +86,7 @@ export async function generate(userMessage) {
     const tool_calls = completions.choices[0].message.tool_calls;
 
     if (!tool_calls) {
+      cache.set(threadId, message);
       return completions.choices[0].message.content;
     }
 
