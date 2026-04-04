@@ -4,6 +4,9 @@ const sendBtn = document.querySelector("#ask");
 input?.addEventListener("keyup", handleEnter);
 sendBtn?.addEventListener("click", handleAsk);
 
+const threadId =
+  Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
+
 const loading = document.createElement("div");
 loading.className = "my-6 animate.pulse";
 loading.textContent = "Thinking...";
@@ -31,9 +34,7 @@ async function callServer(inputText) {
     headers: {
       "content-Type": "application/json",
     },
-    body: JSON.stringify({
-      message: inputText,
-    }),
+    body: JSON.stringify({ threadId, message: inputText }),
   });
   if (!res.ok) {
     throw new Error("Error generating response");
